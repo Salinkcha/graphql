@@ -120,159 +120,85 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
-/* Audit Ratio Chart */
-.audit-chart {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  margin-top: 20px;
-}
-
-.audit-bar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.audit-label {
-  width: 80px;
-  font-size: 14px;
-  color: var(--text-light);
-  text-align: right;
-}
-
-.audit-line {
-  flex-grow: 1;
-  height: 30px;
-  background: linear-gradient(to right, 
-      var(--primary) 0%, 
-      var(--primary) var(--audit-received), 
-      #e0e0e0 var(--audit-received), 
-      #e0e0e0 100%);
-  border-radius: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 15px;
-  color: white;
-  font-weight: bold;
-  font-size: 14px;
-  position: relative;
-  overflow: hidden;
-}
-
-/* Line Chart - Version corrigée */
-.line-chart-wrapper {
-  display: flex;
+/* SVG Charts Common Styles */
+.xp-svg-chart, .audit-svg-chart {
   width: 100%;
-  height: 300px;
-  position: relative;
+  background-color: var(--card);
+  border-radius: 8px;
+  margin-top: 15px;
 }
 
-.line-chart-container {
-  flex: 1;
-  position: relative;
-  margin-left: 50px; /* Espace pour l'échelle Y */
-  height: 100%;
-}
-
-.line-chart-svg {
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-.axis-y, .axis-x {
-  stroke: var(--border);
-  stroke-width: 1.5;
-}
-
-.progress-line {
+.xp-svg-chart .line-path {
   fill: none;
   stroke: var(--primary);
   stroke-width: 3;
   stroke-linejoin: round;
 }
 
-.data-point {
+.xp-svg-chart .data-point {
   fill: white;
   stroke: var(--primary);
   stroke-width: 2;
   transition: all 0.2s ease;
 }
 
-.data-point:hover {
-  r: 4;
+.xp-svg-chart .data-point:hover {
+  r: 6;
   stroke-width: 3;
   fill: var(--primary);
 }
 
-/* Échelle Y */
-.y-scale {
-  width: 50px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
-  position: absolute;
-  left: 0;
-}
-
-.y-tick {
-  position: relative;
-  font-size: 0.8rem;
-  color: var(--text-light);
-  text-align: right;
-  padding-right: 10px;
-}
-
-.y-tick::after {
-  content: '';
-  position: absolute;
-  right: 0;
-  top: 50%;
-  width: 8px;
-  height: 1px;
-  background: var(--border);
-}
-
-/* Étiquettes des mois */
-.x-labels {
-  position: absolute;
-  bottom: -25px;
-  width: calc(100% - 50px);
-  height: 40px;
-  margin-left: 50px;
-}
-
-.month-label {
-  position: absolute;
-  font-size: 0.8rem;
-  color: var(--text-light);
-  transform: translateX(-50%);
-  white-space: nowrap;
-}
-
-/* Tooltip */
-.data-point:hover::after {
-  content: attr(data-xp) " XP (" attr(data-month) ")";
-  position: absolute;
-  background: var(--card);
-  padding: 5px 10px;
-  border-radius: 4px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+/* XP Chart Specific */
+.xp-svg-chart .month-label {
   font-size: 12px;
-  white-space: nowrap;
-  transform: translate(-50%, -120%);
-  z-index: 10;
+  fill: var(--text-light);
+  text-anchor: middle;
 }
 
-/* No Data Message */
-.no-data {
-  text-align: center;
-  padding: 2rem;
-  color: var(--text-light);
-  font-style: italic;
+.xp-svg-chart .value-label {
+  font-size: 11px;
+  fill: var(--text);
+  text-anchor: middle;
+  font-weight: 500;
+}
+
+/* Audit Chart Specific */
+.audit-svg-chart {
+  height: 120px;
+}
+
+.audit-svg-chart .audit-bar {
+  fill: var(--primary);
+}
+
+.audit-svg-chart .audit-bar.received {
+  fill: #e0e0e0;
+}
+
+.audit-svg-chart .audit-label {
+  font-size: 12px;
+  fill: var(--text);
+  text-anchor: end;
+}
+
+.audit-svg-chart .audit-value {
+  font-size: 12px;
+  fill: var(--text);
+  text-anchor: start;
+  font-weight: 500;
+}
+
+/* Tooltips */
+.tooltip-box {
+  fill: var(--card);
+  stroke: var(--border);
+  stroke-width: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.tooltip-text {
+  font-size: 12px;
+  fill: var(--text);
 }
 
 /* Buttons */
@@ -321,75 +247,18 @@ input:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 2px rgba(0, 186, 188, 0.2);
 }
-/* Nouveau style simplifié pour le graphique */
-.simple-line-chart {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  height: 300px;
-  margin: 30px 0;
-  padding: 0 20px;
-  position: relative;
-}
 
-.simple-line {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 100%;
-  display: flex;
-  align-items: flex-end;
-}
-
-.simple-line-path {
-  flex-grow: 1;
-  height: 2px;
-  background: var(--primary);
-  margin: 0 10px;
-  position: relative;
-  top: -15px;
-}
-
-.data-point-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-  width: 80px; /* Largeur fixe pour chaque point */
-}
-
-.data-point-circle {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--primary);
-  border: 2px solid white;
-  box-shadow: 0 0 0 2px var(--primary);
-  position: relative;
-  z-index: 2;
-}
-
-.data-point-info {
-  position: absolute;
-  top: -45px;
-  background: white;
-  padding: 5px 10px;
-  border-radius: 4px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  font-size: 12px;
-  white-space: nowrap;
-  text-align: center;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.data-point-container:hover .data-point-info {
-  opacity: 1;
-}
-
-.data-point-month {
-  margin-top: 10px;
-  font-size: 12px;
-  color: var(--text-light);
+/* Responsive */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .profile {
+    padding: 15px;
+  }
+  
+  .chart-container {
+    padding: 15px;
+  }
 }
