@@ -80,20 +80,10 @@ async function showProfile() {
                 <div class="chart-container">
                     <h3>Audit Ratio</h3>
                     <div class="audit-chart">
-                        <div class="audit-bar">
-                            <div class="audit-label">Done</div>
-                            <div class="audit-line" style="--audit-received: ${totalAudits ? (up/totalAudits)*100 : 50}%">
-                             <span class="value">${formatAuditValue(up)}</span>
-                            </div>
+                                <div class="chart-container">
+            <h3>Audit Ratio</h3>
+            ${generateAuditChart(up, down)}
                         </div>
-                        <div class="audit-bar">
-                            <div class="audit-label">Received</div>
-                            <div class="audit-line" style="--audit-received: ${totalAudits ? (down/totalAudits)*100 : 50}%">
-                             <span class="value">${formatAuditValue(down)}</span>
-                            </div>
-                        </div>
-                    </div>
-                    
                     <!-- XP Progress Chart -->
                     <h3 style="margin-top: 40px;">Monthly Progress</h3>
                     <div class="xp-chart-container">
@@ -165,24 +155,68 @@ function calculateCumulative(monthlyData, totalXP) {
  */
 function generateMonthlyChart(data) {
     if (data.length === 0) return '<div class="no-data">No data available</div>';
-  
+    
+    const svgWidth = 800;
+    const svgHeight = 300;
+    const margin = { top: 40, right: 40, bottom: 60, left: 40 };
+    const width = svgWidth - margin.left - margin.right;
+    const height = svgHeight - margin.top - margin.bottom;
+    
+    // Calculate positions
+    const maxXP = data[data.length - 1].cumulativeXP;
+    const xScale = width / (data.length - 1);
+    const yScale = height / maxXP;
+    
+    // Generate path data for the line
+    let pathData = '';
+    data.forEach((month, index) => {
+        const x = margin.left + (index * xScale);
+        const y = margin.top + height - (month.cumulativeXP * yScale);
+        
+        if (index === 0) {
+            pathData += `M ${x} ${y}`;
+        } else {
+            pathData += ` L ${x} ${y}`;
+        }
+    });
+    
+    // Generate circles and labels
+    let circles = '';
+    let labels = '';
+    let valueLabels = '';
+    
+    data.forEach((month, index) => {
+        const x = margin.left + (index * xScale);
+        const y = margin.top + height - (month.cumulativeXP * yScale);
+        
+        // Circle
+        circles += `<circle cx="${x}" cy="${y}" r="4" class="data-point" />`;
+        
+        // Month label
+        labels += `<text x="${x}" y="${height + margin.top + 20}" class="month-label">${month.label}</text>`;
+        
+        // Value label
+        valueLabels += `
+            <text x="${x}" y="${y - 10}" class="value-label">
+                ${month.cumulativeXP} XP
+            </text>
+        `;
+    });
+    
     return `
-      <div class="simple-line-chart">
-        <div class="simple-line">
-          ${data.map((month, index) => `
-            <div class="data-point-container" style="height: ${(month.cumulativeXP / data[data.length-1].cumulativeXP) * 100}%">
-              <div class="data-point-info">
-                ${month.totalXP} XP this month<br>
-                Total: ${month.cumulativeXP} XP<br>
-                ${month.label}
-              </div>
-              <div class="data-point-circle"></div>
-              <div class="data-point-month">${month.label}</div>
-              ${index < data.length - 1 ? '<div class="simple-line-path"></div>' : ''}
-            </div>
-          `).join('')}
-        </div>
-      </div>
+        <svg width="100%" viewBox="0 0 ${svgWidth} ${svgHeight}" class="xp-svg-chart">
+            <!-- Line path -->
+            <path d="${pathData}" class="line-path" />
+            
+            <!-- Data points -->
+            ${circles}
+            
+            <!-- Value labels -->
+            ${valueLabels}
+            
+            <!-- Month labels -->
+            ${labels}
+        </svg>
     `;
 }
 
@@ -213,6 +247,34 @@ function logout() {
     removeToken();
     showLogin();
 }
-
+function generateAuditChart(up, down) {
+    const total = up + down;
+    const upPercent = total ? (up / total) * 100 : 50;
+    const downPercent = total ? (down / total) * 100 : 50;
+    
+    const formatValue = (value) => {
+        if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
+        if (value >= 1000) return (value / 1000).toFixed(1) + 'K';
+        return value;
+    };
+    
+    return `
+        <svg width="100%" height="120" viewBox="0 0 600 120" class="audit-svg-chart">
+            <!-- Done audits -->
+            <g transform="translate(100, 20)">
+                <text x="-90" y="25" class="audit-label">Done</text>
+                <rect width="${400 * upPercent / 100}" height="40" class="audit-bar" />
+                <text x="${400 * upPercent / 100 + 10}" y="25" class="audit-value">${formatValue(up)}</text>
+            </g>
+            
+            <!-- Received audits -->
+            <g transform="translate(100, 70)">
+                <text x="-90" y="25" class="audit-label">Received</text>
+                <rect width="${400 * downPercent / 100}" height="40" class="audit-bar received" />
+                <text x="${400 * downPercent / 100 + 10}" y="25" class="audit-value">${formatValue(down)}</text>
+            </g>
+        </svg>
+    `;
+}
 // Initialize the app with login screen
 showLogin();
